@@ -1,0 +1,18 @@
+{
+    "base_model": "google/gemma-3-270m",
+    "train_data_path": "data/oasstetc_all_train.csv",
+    "eval_data_path": "data/oasstetc_all_test.csv",
+    "KL_alpha": 500,
+    "use_surprisal_loss": true,
+    "use_wandb": false,
+    "num_train_epochs": 3,
+    "per_device_train_batch_size": 1,
+    "learning_rate": 2e-5,
+    "max_grad_norm": 1.0,
+    "warmup_steps": 50,
+    "logging_steps": 10,
+    "eval_steps": 100,
+    "save_steps": 100,
+    "save_total_limit": 2,
+    "total_steps": 1000
+}
