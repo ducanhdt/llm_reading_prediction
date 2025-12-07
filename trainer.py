@@ -95,7 +95,6 @@ def train_model(config_path):
 		# callbacks=[MetricsCallback()]
 	)
 
-	os.environ["WANDB_DISABLED"] = "true"
 	if os.environ["WANDB_DISABLED"] == "false":
 		import wandb
 		wandb.login(key="5dcf43d42b9e34786a216356f212ffb5fd2656c1")
