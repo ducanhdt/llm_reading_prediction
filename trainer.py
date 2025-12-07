@@ -106,8 +106,6 @@ def train_model(config_path):
 			config=config,
 			name=f"{base_model}-rt-KL{KL_alpha}-lr-{learning_rate}"
 		)
-		# Update training args to report to wandb
-		training_args.report_to = ["wandb"]
 
 
 	print("start Training")
