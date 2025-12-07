@@ -92,6 +92,7 @@ def train_model(config_path):
 		train_dataset=tokenized_dataset,
 		eval_dataset=tokenized_dataset_test,
 		data_collator=data_collator,
+      	compute_metrics=compute_metrics,
 		# callbacks=[MetricsCallback()]
 	)
 
