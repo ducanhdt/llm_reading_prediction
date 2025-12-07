@@ -42,15 +42,16 @@ def train_model(config_path):
 	save_steps = config.get("save_steps", 100)
 	save_total_limit = config.get("save_total_limit", 2)
 	total_steps = config.get("total_steps", 1000)
-	train_path = config.get("train_path", "data/data_splits/original_data/oasstetc_complete.csv")
-	test_path = config.get("test_path", "data/datasets/zuco_test.csv")
+	train_path = config.get("train_path", "data/oasstetc_all_train.csv")
+	eval_path = config.get("eval_path", "data/oasstetc_all_test.csv")
 	target_feature = config.get("target_feature", "first_fix_dur")
-
+	push_to_hub = config.get("push_to_hub", True)
+ 
 	model = GemmaWithRegressionHead(base_model,KL_alpha=KL_alpha,use_surprisal_loss=use_surprisal_loss)
-	df_test = read_data(test_path, target_feature)
+	df_eval = read_data(eval_path, target_feature)
 	df_train = read_data(train_path, target_feature)
 	dataset = Dataset.from_pandas(df_train)
-	dataset_test = Dataset.from_pandas(df_test)
+	dataset_test = Dataset.from_pandas(df_eval)
 
 	# Tokenize the dataset
 	tokenized_dataset = dataset.map(tokenize_and_align_labels, batched=True, fn_kwargs={"tokenizer": model.tokenizer})
@@ -103,14 +104,18 @@ def train_model(config_path):
 		wandb.init(
 			project="gemma-reading-time",
 			config=config,
+			name=f"{base_model}-rt-KL{KL_alpha}-lr-{learning_rate}"
 		)
-
 		# Update training args to report to wandb
 		training_args.report_to = ["wandb"]
 
 
 	print("start Training")
 	trainer.train()
+	
+	if push_to_hub:
+		model.base_model.push_to_hub(f"anhdtd/{base_model}-rt-KL{KL_alpha}-lr-{learning_rate}", use_safetensors=True)
+
 	return model
 if __name__ == "__main__":
 	import argparse
@@ -118,4 +123,5 @@ if __name__ == "__main__":
 	parser.add_argument("--config", type=str, help="Path to the config file.", default="sample_config.json")
 
 	args = parser.parse_args()
+	print(f"Using config file: {args.config}")
 	train_model(args.config)

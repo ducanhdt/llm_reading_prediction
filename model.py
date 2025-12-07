@@ -14,15 +14,25 @@ class GemmaWithRegressionHead(nn.Module):
 		
 		self.tokenizer = AutoTokenizer.from_pretrained(base_model)
 		self.base_model = AutoModelForCausalLM.from_pretrained(base_model)
-		
-		self.lora_config = LoraConfig(
-			task_type=TaskType.CAUSAL_LM,
-			r=8,
-			lora_alpha=32,
-			lora_dropout=0.1,
-			target_modules=["q_proj", "v_proj"]
-		)
-
+		if base_model.startswith("google/gemma"):
+			self.lora_config = LoraConfig(
+				task_type=TaskType.CAUSAL_LM,
+				r=8,
+				lora_alpha=32,
+				lora_dropout=0.1,
+				target_modules=["q_proj", "v_proj"]
+			)
+		elif base_model.startswith("Qwen"):
+			self.lora_config = LoraConfig(
+				task_type=TaskType.CAUSAL_LM,
+				r=8,
+				lora_alpha=32,
+				lora_dropout=0.1,
+				target_modules=["qkv_proj", "o_proj"]
+			)
+		else:
+			#Error for unsupported models
+			raise ValueError(f"LoRA configuration not defined for base model: {base_model}")
 		self.base_model = get_peft_model(self.base_model, self.lora_config)
 
   
@@ -43,6 +53,9 @@ class GemmaWithRegressionHead(nn.Module):
 		"""Compute surprisal values"""
 		# Add BOS token manually - match batch size
 		batch_size = input_ids.size(0)
+		if self.tokenizer.bos_token_id is None:
+			Warning("The tokenizer does not have a BOS token defined. use pad token instead.")
+			self.tokenizer.bos_token_id = self.tokenizer.pad_token_id
 		bos_tensor = torch.full((batch_size, 1), self.tokenizer.bos_token_id, dtype=torch.long, device=self.base_model.device)
 		input_ids_with_bos = torch.cat([bos_tensor, input_ids], dim=1)
 		
