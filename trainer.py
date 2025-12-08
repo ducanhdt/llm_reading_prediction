@@ -82,7 +82,7 @@ def train_model(config_path):
 		output_name = f"qwen0.6b-reading-time-KL-{KL_alpha}-lr-{learning_rate}"
   
 	training_args = TrainingArguments(
-		output_dir=output_name,
+		output_dir="tmp",
 		num_train_epochs=num_train_epochs,
 		per_device_train_batch_size=per_device_train_batch_size,
 		learning_rate=learning_rate,
