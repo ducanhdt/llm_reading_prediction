@@ -82,7 +82,7 @@ def train_model(config_path):
 		output_name = f"qwen0.6b-reading-time-KL-{KL_alpha}-lr-{learning_rate}"
   
 	training_args = TrainingArguments(
-		output_dir=f"./{output_name}",
+		output_dir=output_name,
 		num_train_epochs=num_train_epochs,
 		per_device_train_batch_size=per_device_train_batch_size,
 		learning_rate=learning_rate,
@@ -123,7 +123,7 @@ def train_model(config_path):
 		wandb.init(
 			project="gemma-reading-time",
 			config=config,
-			name=f"{base_model}-rt-KL{KL_alpha}-lr-{learning_rate}",
+			name=output_name,
 		)
 
 	print("start Training")
@@ -131,7 +131,7 @@ def train_model(config_path):
 
 	if push_to_hub:
 		model.base_model.push_to_hub(
-			f"anhdtd/{base_model}-rt-KL{KL_alpha}-lr-{learning_rate}",
+			output_name,
 			use_safetensors=True,
 		)
 
