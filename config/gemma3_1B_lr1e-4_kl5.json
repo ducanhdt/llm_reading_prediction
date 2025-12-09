@@ -14,5 +14,7 @@
     "eval_steps": 100,
     "save_steps": 100,
     "save_total_limit": 2,
-    "total_steps": 1000
+    "total_steps": 1000,
+    "target_feature": "fix_dur",
+    "push_to_hub": false
 }

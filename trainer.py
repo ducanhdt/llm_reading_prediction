@@ -134,6 +134,12 @@ def train_model(config_path):
 			output_name,
 			use_safetensors=True,
 		)
+	else:
+		# create trained_models directory if it doesn't exist
+		if not os.path.exists("trained_models"):
+			os.makedirs("trained_models")
+		output_name = os.path.join("trained_models", output_name)
+		model.base_model.save_pretrained(output_name, safe_serialization=True)
 
 	return model
 
