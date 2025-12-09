@@ -121,7 +121,7 @@ def train_model(config_path):
 
 		# Initialize wandb
 		wandb.init(
-			project="gemma-reading-time",
+			project="gemma-reading-time-first-fixation",
 			config=config,
 			name=output_name,
 		)
