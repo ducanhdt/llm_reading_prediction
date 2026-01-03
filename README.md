@@ -31,16 +31,33 @@ This project implements a reading time prediction model based on the methodology
 ## Project Structure
 
 ```
-.
-├── model.py              # GemmaWithRegressionHead model definition
-├── trainer.py            # Training script and configuration loader
-├── data_reader.py        # Data loading and preprocessing utilities
-├── sample_config.json    # Example training configuration
-└── data/                 # Dataset directory
-    ├── oasstetc_all_train.csv
-    ├── oasstetc_all_test.csv
-    ├── oasstetc_complete_train.csv
-    └── oasstetc_complete_test.csv
+├── model.py # GemmaWithRegressionHead model definition
+├── trainer.py # Training script and configuration loader
+├── data_reader.py # Data loading and preprocessing utilities
+├── sample_config.json # Example training configuration
+├── data/ # Dataset directory
+│ ├── oasstetc_all_train.csv
+│ ├── oasstetc_all_test.csv
+│ ├── oasstetc_complete_train.csv
+│ └── oasstetc_complete_test.csv
+│
+├── Evaluation/ # Evaluation protocols and analysis
+│ ├── explicit_eval/ # Explicit preference-based evaluation
+│ │ ├── build_triples.py # Build (prompt, chosen, rejected) triples
+│ │ ├── model_registry.py # Unified registry for baseline / finetuned / PEFT models
+│ │ ├── explicit_eval.py # Preference judgment and accuracy computation
+│ │ ├── main_explicit_eval.py # Entry point for explicit evaluation
+│ │ └── plot_accuracy.py # Accuracy visualization
+│ │
+│ └── implicit_eval/ # Implicit cognitive alignment evaluation
+│ ├── model_loader.py # Model loading utilities
+│ ├── model_att.py # Model attention extraction
+│ ├── compare_att.py # Correlation & statistical comparison
+│ ├── plotter.py # Plotting utilities
+│ ├── main_compute_attention.py # Compute model attention signals
+│ ├── main_compare_trials.py # Trial-level correlation analysis
+│ ├── main_plot_attention_layers.py
+│ └── main_plot_chosen_rejected.py
 ```
 
 ## Installation
@@ -181,6 +198,16 @@ The trained model is saved to `./gemma-reading-time/` with:
 - Model checkpoints (every `save_steps`)
 - Training logs
 - Best model based on evaluation loss
+
+## Evaluation
+
+This project adopts a two-level evaluation protocol that distinguishes
+**implicit cognitive alignment** from **explicit preference-based performance**.
+The goal is to analyze whether training signals derived from eye-tracking data
+affect both latent reading behavior and overt decision-making.
+
+All evaluation code is organized under the `Evaluation/` directory.
+
 
 ## Citation
 
