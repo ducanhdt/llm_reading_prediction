@@ -6,8 +6,7 @@ MAX_LEN = 1024
 
 def judge(tok, model, question, A, B):
     """
-    Pairwise preference judging: A vs B
-    Returns: "A" or "B"
+    Pairwise preference judging (logits-based)
     """
 
     # random flip to avoid position bias
@@ -30,6 +29,7 @@ def judge(tok, model, question, A, B):
     token_B = tok.encode("B", add_special_tokens=False)[-1]
 
     pred = "A" if logits[token_A] > logits[token_B] else "B"
+
     if flip:
         pred = "B" if pred == "A" else "A"
 
@@ -43,6 +43,6 @@ def evaluate_model(tok, model, triples):
     correct = 0
     for q, good, bad in triples:
         pred = judge(tok, model, q, bad, good)
-        if pred == "B":  # good is B
+        if pred == "B":  # good always in B
             correct += 1
     return correct / len(triples)

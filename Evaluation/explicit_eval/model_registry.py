@@ -14,16 +14,21 @@ def get_tokenizer(path):
     return _TOKENIZER_CACHE[path]
 
 
-def load_model(cfg):
+def load_single_model(cfg):
     """
-    cfg examples:
-    {type: hf, path: gpt2}
-    {type: full, path: /path/to/model}
-    {type: peft, base: google/gemma-3-1b-it, path: adapter_dir}
+    cfg: dict from MODEL_REGISTRY
+    Returns: tokenizer, model
     """
 
-    device_map = "auto"
-    dtype = torch.float16 if torch.cuda.is_available() else None
+    is_gpt2 = (
+        cfg["type"] in ["hf", "full"]
+        and cfg["path"] in ["gpt2", "gpt2-medium"]
+    )
+
+    device_map = "cuda" if torch.cuda.is_available() else "cpu"
+    dtype = torch.float32 if is_gpt2 else (
+        torch.float16 if torch.cuda.is_available() else None
+    )
 
     if cfg["type"] in ["hf", "full"]:
         tok = get_tokenizer(cfg["path"])
@@ -32,6 +37,7 @@ def load_model(cfg):
             trust_remote_code=True,
             device_map=device_map,
             torch_dtype=dtype,
+            low_cpu_mem_usage=True,
         )
 
     elif cfg["type"] == "peft":
@@ -43,6 +49,7 @@ def load_model(cfg):
                 trust_remote_code=True,
                 device_map=device_map,
                 torch_dtype=dtype,
+                low_cpu_mem_usage=True,
             )
 
         model = PeftModel.from_pretrained(
@@ -51,7 +58,7 @@ def load_model(cfg):
         )
 
     else:
-        raise ValueError(cfg)
+        raise ValueError(cfg["type"])
 
     model.eval()
     return tok, model

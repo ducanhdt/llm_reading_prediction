@@ -2,22 +2,36 @@ import os
 import matplotlib.pyplot as plt
 
 
-def plot_accuracy(results, title, save_path):
+def plot_accuracy(results, title, save_dir="figures", filename=None):
+    os.makedirs(save_dir, exist_ok=True)
+
     names = list(results.keys())
     accs = list(results.values())
 
     plt.figure(figsize=(6, 4))
     bars = plt.bar(names, accs)
+
     plt.ylim(0, 1)
     plt.ylabel("Accuracy")
     plt.title(title)
-    plt.xticks(rotation=30, ha="right")
 
-    for b, a in zip(bars, accs):
-        plt.text(b.get_x() + b.get_width()/2, a + 0.01, f"{a:.3f}",
-                 ha="center", fontsize=9)
+    for bar, acc in zip(bars, accs):
+        plt.text(
+            bar.get_x() + bar.get_width() / 2,
+            acc + 0.01,
+            f"{acc:.3f}",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+        )
 
-    os.makedirs(os.path.dirname(save_path), exist_ok=True)
+    plt.xticks(rotation=25)
     plt.tight_layout()
-    plt.savefig(save_path, dpi=300)
+
+    if filename is None:
+        filename = title.lower().replace(" ", "_") + ".png"
+
+    path = os.path.join(save_dir, filename)
+    plt.savefig(path, dpi=300, bbox_inches="tight")
     plt.close()
+    print(f"[Saved] {path}")
